@@ -1,0 +1,134 @@
+\BLOCK{set icevent=Event}
+\BLOCK{set sens=Sensitivities.summary}
+
+\BLOCK{ if datasource == "rt" }
+
+    \BLOCK{set instruments="SPI-ACS"}
+
+\BLOCK{ elif datasource == "nrt" }
+
+    \BLOCK{set instruments="SPI-ACS and IBIS"}
+
+\BLOCK{else}
+
+    \BLOCK{ raise "datasources is undefined: "+datasource }
+
+\BLOCK{ endif }
+
+
+\BLOCK{ if DetectionSummary.detection_decision }
+\BLOCK{ if DetectionSummary.detection_associated }
+\VAR{event_class} \VAR{icevent.event_name}: 1 counterpart candidate from INTEGRAL \VAR{ instruments } prompt observation
+\BLOCK{ else }
+\BLOCK{ if DetectionSummary.detection_somewhat_associated }
+\VAR{event_class} \VAR{icevent.event_name}: 1 weakly associated counterpart candidate in INTEGRAL \VAR{ instruments } prompt observation
+\BLOCK{ else }
+\VAR{event_class} \VAR{icevent.event_name}: No counterpart candidates in INTEGRAL \VAR{ instruments } prompt observation
+\BLOCK{ endif }
+\BLOCK{ endif }
+\BLOCK{ else }
+\VAR{event_class} \VAR{icevent.event_name}: No counterpart candidates in INTEGRAL \VAR{ instruments } prompt observation
+\BLOCK{ endif }
+
+NOWRAP \VAR{shift.fullnames}
+NOWRAP V. Savchenko, C. Ferrigno (ISDC/UniGE, Switzerland)
+NOWRAP J. Rodi (IAPS-Roma, Italy)
+NOWRAP A. Coleiro (APC, France)
+NOWRAP S. Mereghetti (INAF IASF-Milano, Italy)
+
+on behalf of the INTEGRAL multi-messenger collaboration:
+https://www.astro.unige.ch/cdci/integral-multimessenger-collaboration
+
+
+\BLOCK{ if datasource == "nrt" }
+Using combination of INTEGRAL all-sky detectors (following [1]): SPI/ACS, IBIS/Veto, and IBIS  we have performed a search for a prompt gamma-ray
+counterpart of \VAR{icevent.event_name} (GCN \VAR{icevent.gcn.number}).
+\BLOCK{ else }
+Using INTEGRAL/SPI-ACS realtime data (following [1]) we have performed a search for a prompt gamma-ray
+counterpart of \VAR{icevent.event_name} (GCN \VAR{icevent.gcn.number}).
+\BLOCK{ endif }
+
+At the time of the event (\VAR{icevent.event_time.utc|format_utc} UTC,
+hereafter T0), \VAR{OperationsReport.text}. The peak of the event
+localization probability was at an angle of
+\VAR{ScSystem.sc.theta|round(0)|int} deg with respect to the
+spacecraft pointing axis. \VAR{OrientationComment.text}.
+
+The background within +/-300 seconds around the event was
+\VAR{BackgroundStabilityAssertion.text}.  
+
+\BLOCK{ if datasource == "rt" }
+We have performed a search for any impulsive events in INTEGRAL SPI-ACS (as described in [2]) data.
+\BLOCK{ else }
+We have performed a search for any impulsive events in INTEGRAL SPI-ACS (as described in [2]), IBIS, and IBIS/Veto data.
+\BLOCK{ endif }
+
+\BLOCK{ if DetectionSummary.detection_decision }
+\VAR{DetectionSummary.txt}
+
+Otherwise, we estimate
+\BLOCK{ else }
+We do not detect any significant counterparts and estimate
+\BLOCK{ endif }
+a 3-sigma upper limit on the
+75-2000 keV fluence of \VAR{sens.hard.p50_typical|text_exp} erg/cm^2 (within the 50% probability containment region of the source localization) for a
+burst lasting less than 1 s with a characteristic short GRB spectrum
+(an exponentially cut off power law with alpha=-0.5 and Ep=600 keV)
+occurring at any time in the interval within 300 s around T0.
+For a typical long GRB spectrum (Band function with alpha=-1,
+beta=-2.5, and Ep=300 keV), the derived peak flux upper limit is
+~\VAR{sens.soft1s.p50_typical|text_exp} (\VAR{ (0.125*sens.soft.p50_min)|text_exp}) erg/cm^2/s at 1 s
+(8 s) time scale in 75-2000 keV energy range.
+
+\BLOCK{ if distance }
+For the mean reported distance \VAR{ distance.mean_Mpc | round(0) } Mpc this corresponds to the limit on the total isotropic 
+equivalent energy in 1 s of \VAR{ at_distance.at_mean.hard.p50_typical | text_exp } erg for the short GRB spectrum and for a long GRB spectrum isotropic equivalent luminosity in 1 s (8 s) of \VAR{ at_distance.at_mean.soft1s.p50_min | text_exp } erg/s (\VAR{ (0.125*at_distance.at_mean.soft.p50_min) | text_exp } erg/s)
+\BLOCK{ endif }
+
+We report for completeness and in order of FAP, all excesses identified in the search region. We find:
+\BLOCK{ for excess_class in DetectionSummary.excess_by_class }
+\BLOCK{ if excess_class.excesses }
+\BLOCK{ if excess_class.excesses|length > 1 }
+\VAR{excess_class.excesses|length} \VAR{excess_class.comment} excesses:
+\BLOCK{ else }
+\VAR{excess_class.excesses|length} \VAR{excess_class.comment} excess:
+\BLOCK{ endif }
+
+\BLOCK{ if distance }
+NOWRAP \VAR{ "%-8s | %-7s | %-3s | luminosity ( x %5.0lg erg/s) | %-5s  " | format("T-T0", "scale","S/N",DetectionSummary.luminosity_scale,"FAP" ) }
+\BLOCK{ else }
+NOWRAP \VAR{ "%-8s | %-7s | %-3s | flux ( x %5.0lg erg/cm2/s)     | %-5s  " | format("T-T0", "scale","S/N",DetectionSummary.flux_scale,"FAP" ) }
+\BLOCK{ endif }
+\BLOCK{ for i in excess_class.excesses }
+\BLOCK{ if i.excess.FAP < excess_class.fap_limit }
+\BLOCK{ if distance }
+NOWRAP \VAR{ "%-8.3lg | %-7.3lg | %-3.2lg | %8.3lg +/- %-6.3lg +/- %-6.3lg | %-5.3lg " | format(i.excess.rel_s_scale, i.scale, i.excess.snr, i.excess.luminosity_scaled, i.excess.luminosity_scaled_err, i.excess.luminosity_scaled_err_loc, i.excess.FAP) }
+\BLOCK{ else }
+NOWRAP \VAR{ "%-8.3lg | %-7.3lg | %-3.2lg | %8.3lg +/- %-6.3lg +/- %-6.3lg | %-5.3lg " | format(i.excess.rel_s_scale, i.scale, i.excess.snr, i.excess.flux_scaled, i.excess.flux_scaled_err, i.excess.flux_scaled_err_loc, i.excess.FAP) }
+\BLOCK{ endif }
+\BLOCK{ endif }
+\BLOCK{ endfor }
+
+\BLOCK{ endif }
+\BLOCK{ endfor }
+
+Note that FAP estimates (especially at timescales above 2s) may be possibly further affected by enhanced non-stationary local background noise.
+This list excludes any excesses for which FAP is close to unity.
+
+\VAR{FinalComment.comment}
+
+All results quoted are preliminary.
+
+This circular is an official product of the INTEGRAL Multi-Messenger team.
+
+Note that we send GCNs Circulars only when one of the following conditions is met: merger contains at least one neutron star, a singificant counterpart is reported.
+
+[1] Savchenko et al. 2017, A&A 603, A46
+[2] Savchenko et al. 2012, A&A 541A, 122S
+
+GCN pipeline version: \VAR{ gcn_repo_version }
+
+\BLOCK{ for link in links }
+\VAR{link}
+\BLOCK{ endfor }
+
