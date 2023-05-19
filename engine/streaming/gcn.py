@@ -1,6 +1,8 @@
 import json
 import logging
 import os
+import re
+import time
 import click
 import xmltodict
 
@@ -28,29 +30,26 @@ consumer.subscribe(['gcn.classic.voevent.INTEGRAL_REFINED',
                     'gcn.classic.voevent.LVC_INITIAL',
                     'gcn.classic.voevent.LVC_PRELIMINARY'])
 
-@click.command()
-@click.option('--debug/--no-debug', default=False)
-def main(debug):
-    if debug:
-        logging.basicConfig(level=logging.DEBUG)
-    else:
-        logging.basicConfig(level=logging.INFO)
 
     # consumer.seek('gcn.classic.voevent.INTEGRAL_REFINED', 0)
 
+
+@click.command("gcn")
+def subscribe_gcn():
     while True:
         for message in consumer.consume(timeout=1):
             value = message.value()
             logger.info("got message %s value %s", message, value)
 
+            t0 = time.strftime("%Y%m%d_%H%M%S")
+
             try:
-                value_json = xmltodict.parse(value['content'])
+                value_json = xmltodict.parse(value)
                 os.makedirs("messages/inbox", exist_ok=True)
-                with open("messages/inbox/%s.json" % value_json['ivorn'], "w") as f:
+                label = re.sub("[^0-9a-zA-Z]", "_", value_json['voe:VOEvent']['@ivorn'])
+                with open(f"messages/inbox/{t0}_{label}.json", "w") as f:
                     json.dump(value, f)
             except Exception as e:
                 logger.error("unable to save message %s", e)
-
-
-if __name__ == '__main__':
-    main()
+                with open(f"messages/inbox/{t0}.data", "wb") as f:
+                    f.write(value)

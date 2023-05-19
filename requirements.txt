@@ -1,2 +1,3 @@
 gcn-kafka
 xmltodict
+hop-client

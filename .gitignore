@@ -1,0 +1,5 @@
+*output.ipynb
+__pycache__
+.nb2workflow
+*_output.html
+*_output.json
