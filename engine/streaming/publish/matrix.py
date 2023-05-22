@@ -11,31 +11,45 @@ channel_test = subprocess.check_output(["pass", "matrix-imma-channel"]).decode("
 matrix = MatrixHttpApi("https://matrix.org", token=token)
 
 template = Template("""
-{{parse.event_id}} at {{parse.t0_utc}} excesses:
+{{parse.event_id}} at {{parse.t0_utc}}
+
+{% if integralallsky %}
+SPI-ACS excesses:
 {%- for entry in integralallsky.reportable_excesses -%}
 {%- if entry.excess.FAP < 1 %}
 at T0+{{entry.excess.rel_s_scale | round(2)}} FAP = {{entry.excess.FAP | round(3)}}
 {%- endif -%}
 {%- endfor -%}
+{% endif %}
+
+{% if ivis %}
+{% endif %}
+
 """)
 
 def publish(data, test=True):
     message = template.render(data)
     print(message)
 
-    # if test:
-    #     channel = channel_test
-    # else:
-    #     channel = channel_real
+    channel = get_a_room(f'INTEGRAL-{data["parse"]["event_id"]}')
+        
+    matrix.send_message(channel, message)
 
-    room_alias = f'INTEGRAL-{data["parse"]["event_id"]}'
+    for section in ['integralallsky', 'ivis']:
+        if section in data:
+            for k, v in data[section].items():
+                if k.endswith("_content"):
+                    uploaded = matrix.media_upload(BytesIO(base64.b64decode(v)), "image/png", k)
+                    print(uploaded)
+                    matrix.send_content(channel, uploaded['content_uri'], k, "m.image")
 
+
+def get_a_room(room_alias):
     try:
         channel = matrix.create_room(room_alias)['room_id']
     except Exception as e:
         print("failed to create room due to", e)
         channel = f"#{room_alias}:matrix.org"
-
     
     try:
         channel = matrix.join_room(channel)['room_id']
@@ -43,11 +57,4 @@ def publish(data, test=True):
     except Exception as e:
         print("failed to join room due to", e)
 
-        
-    matrix.send_message(channel, message)
-
-    for k, v in data['integralallsky'].items():
-        if k.endswith("_content"):
-            uploaded = matrix.media_upload(BytesIO(base64.b64decode(v)), "image/png", k)
-            print(uploaded)
-            matrix.send_content(channel, uploaded['content_uri'], k, "m.image")
+    return channel

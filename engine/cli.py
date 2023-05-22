@@ -1,7 +1,9 @@
 import logging
 import click
+from odafunction import logs
 
 from .ops import babysit_realtime
+from .engine import run_sequence
 
 @click.group()
 @click.option('--debug/--no-debug', default=False)
@@ -11,6 +13,10 @@ def cli(debug):
     else:
         logging.basicConfig(level=logging.INFO)
 
+    logs.app_logging.setup()
+
+
 if __name__ == '__main__':
     cli.add_command(babysit_realtime)
+    cli.add_command(run_sequence)
     cli()

@@ -3,3 +3,6 @@ xmltodict
 hop-client
 integral-client
 isdc-client
+astropy_healpix
+integral-visibility
+ligo.skymap
