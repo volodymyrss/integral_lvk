@@ -1,7 +1,12 @@
+import click
+import logging
 
 from odafunction.executors import default_execute_to_value
 from odafunction.func.urifunc import URIipynbFunction
 import os
+
+from .streaming.publish.matrix import publish as publish_matrix
+
 
 def run_workflow(workflow, input):
     f = URIipynbFunction.from_uri("file://" + os.path.abspath(workflow))
@@ -10,6 +15,37 @@ def run_workflow(workflow, input):
     print("found parameters applied as", f)
     return default_execute_to_value(f, cached=True)['output_values']
 
-def sequence(input):
-    run_workflow("workflows/iobserve.ipynb", input)
-    run_workflow("workflows/integralallsky.ipynb", input)
+def sequence(fn, publish=False):
+    parsed_alert = run_workflow("workflows/parse.ipynb", {'alert_url': fn})
+
+    # run_workflow("workflows/iobserve.ipynb", input)
+    
+    integralallsky = run_workflow("workflows/integralallsky.ipynb", 
+                 {k:v for k, v in parsed_alert.items() if k in ['t0_utc']})
+
+    for k,v in integralallsky.items():
+        print(k, str(v)[:100])
+
+    if publish:
+        publish_matrix(integralallsky)
+
+    
+
+@click.group()
+@click.version_option()
+@click.option("--debug", "-d", is_flag=True, help="Enables debug mode.")
+def cli(debug):
+    if debug:
+        logging.basicConfig(level=logging.DEBUG)
+    else:
+        logging.basicConfig(level=logging.INFO)
+
+@cli.command("process-file")
+@click.argument("fn")
+@click.option("--publish/--no-publish", default=False)
+def run_sequence(fn, publish):
+    sequence(fn, publish=publish)
+
+if __name__ == "__main__":
+    cli.add_command(run_sequence)
+    cli()

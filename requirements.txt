@@ -1,3 +1,5 @@
 gcn-kafka
 xmltodict
 hop-client
+integral-client
+isdc-client
