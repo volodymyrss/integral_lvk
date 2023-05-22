@@ -16,18 +16,17 @@ def run_workflow(workflow, input):
     return default_execute_to_value(f, cached=True)['output_values']
 
 def sequence(fn, publish=False):
-    parsed_alert = run_workflow("workflows/parse.ipynb", {'alert_url': fn})
+    data = {}
+
+    data['parse'] = run_workflow("workflows/parse.ipynb", {'alert_url': fn})
 
     # run_workflow("workflows/iobserve.ipynb", input)
     
-    integralallsky = run_workflow("workflows/integralallsky.ipynb", 
-                 {k:v for k, v in parsed_alert.items() if k in ['t0_utc']})
-
-    for k,v in integralallsky.items():
-        print(k, str(v)[:100])
+    data['integralallsky'] = run_workflow("workflows/integralallsky.ipynb", 
+                 {k:v for k, v in data['parse'].items() if k in ['t0_utc']})
 
     if publish:
-        publish_matrix(integralallsky)
+        publish_matrix(data)
 
     
 
