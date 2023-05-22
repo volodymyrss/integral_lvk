@@ -31,10 +31,10 @@ def sequence(fn, publish=False, publish_production=True):
     # iobserve_input = pick_keys(data['parse'], ['t0_utc'])
     # run_workflow("workflows/iobserve.ipynb", iobserve_input)
 
-    # integralallsky_input = pick_keys(data['parse'], ['t0_utc'])
+    integralallsky_input = pick_keys(data['parse'], ['t0_utc'])
     # # try:
-    # integralallsky_input['mode'] = 'scw'
-    # data['integralallsky'] = run_workflow("workflows/integralallsky.ipynb", integralallsky_input)
+    integralallsky_input['mode'] = 'scw'
+    data['integralallsky'] = run_workflow("workflows/integralallsky.ipynb", integralallsky_input)
     # # except Exception as e:
     # #     integralallsky_input['mode'] = 'rt'
     # #     data['integralallsky'] = run_workflow("workflows/integralallsky.ipynb", integralallsky_input)
