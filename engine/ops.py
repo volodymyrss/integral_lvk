@@ -8,12 +8,12 @@ def run_on_cdcicn02(cmd):
     return subprocess.check_output(["ssh", "cdcicn02", cmd]).decode()
 
 @click.command("babysit-realtime")
-@click.option("--interval", default=60)
+@click.option("--interval", default=300)
 def babysit_realtime(interval):
     while True:
         try:
             query_range = 10
-            lag = 200
+            lag = 300
             t = Time(Time.now().mjd - lag/24/3600, format='mjd').isot
 
             print("querying realtime data for", t)
