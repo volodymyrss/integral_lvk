@@ -1,8 +1,8 @@
 import base64
 from io import BytesIO
-from jinja2 import Template
 from matrix_client.api import MatrixHttpApi
 import subprocess
+from .templates import format
 
 token = subprocess.check_output(["pass", "matrix"]).decode("utf-8").strip()
 channel_real = subprocess.check_output(["pass", "matrix-imma-channel-real"]).decode("utf-8").strip()
@@ -10,26 +10,10 @@ channel_test = subprocess.check_output(["pass", "matrix-imma-channel"]).decode("
 
 matrix = MatrixHttpApi("https://matrix.org", token=token)
 
-template = Template("""
-{{parse.event_id}} at {{parse.t0_utc}}
 
-{% if integralallsky %}
-SPI-ACS excesses:
-{%- for entry in integralallsky.reportable_excesses -%}
-{%- if entry.excess.FAP < 1 %}
-at T0+{{entry.excess.rel_s_scale | round(2)}} FAP = {{entry.excess.FAP | round(3)}}
-{%- endif -%}
-{%- endfor -%}
-{% endif %}
-
-{% if ivis %}
-{% endif %}
-
-""")
 
 def publish(data, test=True):
-    message = template.render(data)
-    print(message)
+    message = format(data, test)['body']
 
     room = get_a_room(data["parse"]["event_id"], test)
         

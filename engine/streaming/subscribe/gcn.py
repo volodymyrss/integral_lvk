@@ -25,7 +25,7 @@ consumer = Consumer(client_id=get_pass("gcn-kafla-id"),
 consumer.subscribe(['gcn.classic.voevent.INTEGRAL_REFINED',
                     'gcn.classic.voevent.INTEGRAL_SPIACS',
                     'gcn.classic.voevent.IPN_RAW',
-                    # 'gcn.classic.text.LVC_EARLY_WARNING',
+                    'gcn.classic.text.LVC_EARLY_WARNING',
                     'gcn.classic.voevent.LVC_TEST',
                     'gcn.classic.voevent.LVC_INITIAL',
                     'gcn.classic.voevent.LVC_PRELIMINARY'])

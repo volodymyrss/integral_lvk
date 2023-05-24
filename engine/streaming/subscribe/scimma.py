@@ -59,10 +59,18 @@ def subscribe_scimma(topic):
         for message in s:
             t0 = time.strftime("%Y%m%d_%H%M%S")
         
-            parse_notice(message.content[0])
+            print(message.content)
 
-            with open(f"messages/inbox/scimma_{t0}.json", "w") as f:
-                json.dump(message.content, f)
+            try:
+                parse_notice(message.content)
+            except Exception as e:
+                print("unable to parse message", e)
+
+            try:
+                with open(f"messages/inbox/scimma_{t0}.json", "w") as f:
+                    json.dump(message.content[0], f)
+            except Exception as e:
+                print("unable to save message", e)
 
 
 
