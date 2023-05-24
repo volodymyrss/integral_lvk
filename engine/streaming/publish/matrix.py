@@ -33,15 +33,15 @@ def publish(data, test=True):
 
     room = get_a_room(data["parse"]["event_id"], test)
         
-    # matrix.send_message(room, message)
+    matrix.send_message(room, message)
 
-    # for section in ['integralallsky', 'ivis']:
-    #     if section in data:
-    #         for k, v in data[section].items():
-    #             if k.endswith("_content"):
-    #                 uploaded = matrix.media_upload(BytesIO(base64.b64decode(v)), "image/png", k)
-    #                 print(uploaded)
-    #                 matrix.send_content(room, uploaded['content_uri'], k, "m.image")
+    for section in ['integralallsky', 'ivis']:
+        if section in data:
+            for k, v in data[section].items():
+                if k.endswith("_content"):
+                    uploaded = matrix.media_upload(BytesIO(base64.b64decode(v)), "image/png", k)
+                    print(uploaded)
+                    matrix.send_content(room, uploaded['content_uri'], k, "m.image")
 
 
 def get_a_room(event_id, test=True):
@@ -50,13 +50,15 @@ def get_a_room(event_id, test=True):
     else:
         from_channel = channel_real
 
+    print("from channel", from_channel)
+
     room_alias = f'INTEGRAL-{event_id}'
     if test:
         room_alias += "-test"
 
-    channel_members = matrix.get_room_members(from_channel)
+    print("room alias", room_alias)
 
-    print("members", channel_members)
+
 
     try:
         room = matrix.create_room(room_alias)['room_id']
@@ -70,4 +72,20 @@ def get_a_room(event_id, test=True):
     except Exception as e:
         print("failed to join room due to", e)
 
+
+    try:
+        channel_members = matrix.get_room_members(from_channel)
+        print("members", channel_members)
+
+        for user in channel_members['chunk']:
+            if user['content']['membership'] == 'join':
+                print("invite", user)
+                try:
+                    print(matrix.invite_user(room, user['user_id']))
+                except Exception as e:
+                    print("failed to invite user", user, "due to", e)
+
+    except Exception as e:
+        print("failed to get members due to", e)
+    
     return room

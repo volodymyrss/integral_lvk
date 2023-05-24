@@ -53,15 +53,15 @@ def parse_notice(record):
 
 
 @click.command("scimma")
-def subscribe_scimma():
-    # with stream.open('kafka://kafka.scimma.org/igwn.gwalert', 'r') as s:
-    with stream.open('kafka://kafka.scimma.org/igwn.gwalert', 'r') as s:
+@click.option("--topic", default="igwn.gwalert")
+def subscribe_scimma(topic):
+    with stream.open(f'kafka://kafka.scimma.org/{topic}', 'r') as s:
         for message in s:
             t0 = time.strftime("%Y%m%d_%H%M%S")
         
             parse_notice(message.content[0])
 
-            with open(f"messages/inbox/scimma_{t0}.json", "wb") as f:
+            with open(f"messages/inbox/scimma_{t0}.json", "w") as f:
                 json.dump(message.content, f)
 
 
