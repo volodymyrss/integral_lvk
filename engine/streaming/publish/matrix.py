@@ -31,30 +31,43 @@ def publish(data, test=True):
     message = template.render(data)
     print(message)
 
-    channel = get_a_room(f'INTEGRAL-{data["parse"]["event_id"]}')
+    room = get_a_room(data["parse"]["event_id"], test)
         
-    matrix.send_message(channel, message)
+    # matrix.send_message(room, message)
 
-    for section in ['integralallsky', 'ivis']:
-        if section in data:
-            for k, v in data[section].items():
-                if k.endswith("_content"):
-                    uploaded = matrix.media_upload(BytesIO(base64.b64decode(v)), "image/png", k)
-                    print(uploaded)
-                    matrix.send_content(channel, uploaded['content_uri'], k, "m.image")
+    # for section in ['integralallsky', 'ivis']:
+    #     if section in data:
+    #         for k, v in data[section].items():
+    #             if k.endswith("_content"):
+    #                 uploaded = matrix.media_upload(BytesIO(base64.b64decode(v)), "image/png", k)
+    #                 print(uploaded)
+    #                 matrix.send_content(room, uploaded['content_uri'], k, "m.image")
 
 
-def get_a_room(room_alias):
+def get_a_room(event_id, test=True):
+    if test:
+        from_channel = channel_test
+    else:
+        from_channel = channel_real
+
+    room_alias = f'INTEGRAL-{event_id}'
+    if test:
+        room_alias += "-test"
+
+    channel_members = matrix.get_room_members(from_channel)
+
+    print("members", channel_members)
+
     try:
-        channel = matrix.create_room(room_alias)['room_id']
+        room = matrix.create_room(room_alias)['room_id']
     except Exception as e:
         print("failed to create room due to", e)
-        channel = f"#{room_alias}:matrix.org"
+        room = f"#{room_alias}:matrix.org"
     
     try:
-        channel = matrix.join_room(channel)['room_id']
-        print("room join", channel)
+        room = matrix.join_room(room)['room_id']
+        print("room join", room)
     except Exception as e:
         print("failed to join room due to", e)
 
-    return channel
+    return room

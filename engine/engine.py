@@ -49,4 +49,4 @@ def sequence(fn, publish=False, publish_production=True):
 @click.option("--publish/--no-publish", default=False)
 @click.option("--publish-prod", is_flag=True, default=False)
 def run_sequence(fn, publish, publish_prod):
-    sequence(fn, publish=publish, publish_production=publish_prod)
+    sequence(fn, publish=publish, publish_production=not publish_prod)
