@@ -40,7 +40,7 @@ def sequence(fn, publish=False, publish_production=True):
     # #     data['integralallsky'] = run_workflow("workflows/integralallsky.ipynb", integralallsky_input)
 
     if publish:
-        publish_matrix(data, test=publish_production)
+        publish_matrix(data, test=not publish_production)
 
     
 

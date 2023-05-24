@@ -1,3 +1,4 @@
+import json
 import time
 import click
 import logging
@@ -57,11 +58,11 @@ def subscribe_scimma():
     with stream.open('kafka://kafka.scimma.org/igwn.gwalert', 'r') as s:
         for message in s:
             t0 = time.strftime("%Y%m%d_%H%M%S")
-
+        
             parse_notice(message.content[0])
 
-            with open(f"messages/inbox/{t0}.data", "wb") as f:
-                f.write(message.content[0])
+            with open(f"messages/inbox/scimma_{t0}.json", "wb") as f:
+                json.dump(message.content, f)
 
 
 
