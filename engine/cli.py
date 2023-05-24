@@ -4,6 +4,7 @@ from odafunction import logs
 
 from .ops import babysit_realtime
 from .engine import run_sequence
+from .streaming.cli import streaming
 
 @click.group()
 @click.option('--debug/--no-debug', default=False)
@@ -19,4 +20,5 @@ def cli(debug):
 if __name__ == '__main__':
     cli.add_command(babysit_realtime)
     cli.add_command(run_sequence)
+    cli.add_command(streaming)
     cli()

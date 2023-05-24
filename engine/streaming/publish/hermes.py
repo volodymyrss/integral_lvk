@@ -1,0 +1,1 @@
+https://hermes.lco.global/api/v0/submit_message/#post-generic-content-form

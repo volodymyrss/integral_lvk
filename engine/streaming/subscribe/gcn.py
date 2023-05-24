@@ -51,5 +51,5 @@ def subscribe_gcn():
                     json.dump(value, f)
             except Exception as e:
                 logger.error("unable to save message %s", e)
-                with open(f"messages/inbox/{t0}.data", "wb") as f:
+                with open(f"messages/inbox/gcn_{t0}.data", "wb") as f:
                     f.write(value)
