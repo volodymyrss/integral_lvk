@@ -83,6 +83,16 @@ def run_sequence_loop(basedir, publish, publish_prod):
                     logging.error("failed to process %s: %s", fn, e)
                     os.rename(full_fn, os.path.join(failbox, fn))
 
-        print("sleeping")
+        for failfn in os.listdir(failbox):
+            try:
+                age_s = time.time() - time.mktime(time.strptime(failfn, "gcn_%Y%m%d_%H%M%S.data"))
+                if age_s < 900:
+                    print("failure forgiven", failfn)
+                    os.rename(os.path.join(failbox, failfn), os.path.join(inbox, failfn))
+            except Exception as e:
+                print("failure unparsable", failfn, e)
+
+
+        print(".", end="")
 
         time.sleep(10)
