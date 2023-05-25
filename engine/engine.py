@@ -24,24 +24,30 @@ def sequence(fn, publish=False, publish_production=False):
     data = {}
 
     data['parse'] = run_workflow("workflows/parse.ipynb", {'alert_url': fn})
+    
+    data['rtstate'] = run_workflow("workflows/rtstate.ipynb", {'t0_utc': data['parse']['t0_utc']})
 
     if data['parse']['role'] == 'test':
         publish_production = False
 
-    ivis_input = {'tstart_utc': data['parse']['t0_utc']}
-    ivis_input['target_healpix_url'] = data['parse']['skymap_url']
-    data['ivis'] = run_workflow("workflows/integral-visibility.ipynb", ivis_input)
+    if data['rtstate']['prophecy'][1]['expected_data_status'] == 'ONLINE':
 
-    # iobserve_input = pick_keys(data['parse'], ['t0_utc'])
-    # run_workflow("workflows/iobserve.ipynb", iobserve_input)
+        ivis_input = {'tstart_utc': data['parse']['t0_utc']}
+        ivis_input['target_healpix_url'] = data['parse']['skymap_url']
+        data['ivis'] = run_workflow("workflows/integral-visibility.ipynb", ivis_input)
 
-    integralallsky_input = pick_keys(data['parse'], ['t0_utc'])
-    # # try:
-    integralallsky_input['mode'] = 'rt'
-    data['integralallsky'] = run_workflow("workflows/integralallsky.ipynb", integralallsky_input)
-    # # except Exception as e:
-    # #     integralallsky_input['mode'] = 'rt'
-    # #     data['integralallsky'] = run_workflow("workflows/integralallsky.ipynb", integralallsky_input)
+        # iobserve_input = pick_keys(data['parse'], ['t0_utc'])
+        # run_workflow("workflows/iobserve.ipynb", iobserve_input)
+
+        integralallsky_input = pick_keys(data['parse'], ['t0_utc'])
+        # # try:
+        integralallsky_input['mode'] = 'rt'
+        data['integralallsky'] = run_workflow("workflows/integralallsky.ipynb", integralallsky_input)
+        # # except Exception as e:
+        # #     integralallsky_input['mode'] = 'rt'
+        # #     data['integralallsky'] = run_workflow("workflows/integralallsky.ipynb", integralallsky_input)
+    else:
+        print("status if offline", data['rtstate'])
 
     if publish:
         publish_all(["hermes", "matrix"], data, test=not publish_production)

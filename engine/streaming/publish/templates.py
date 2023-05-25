@@ -19,6 +19,8 @@ at T0+{{entry.excess.rel_s_scale | round(2)}} FAP = {{entry.excess.FAP | round(3
 {% if ivis %}
 {% endif %}
 
+{{ rtstate['prophecy'][0] }}
+
 """)
 
 
