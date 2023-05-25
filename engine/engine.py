@@ -86,13 +86,15 @@ def run_sequence_loop(basedir, publish, publish_prod):
         for failfn in os.listdir(failbox):
             try:
                 age_s = time.time() - time.mktime(time.strptime(failfn, "gcn_%Y%m%d_%H%M%S.data"))
-                if age_s < 900:
+                if age_s < 1200:
                     print("failure forgiven", failfn)
                     os.rename(os.path.join(failbox, failfn), os.path.join(inbox, failfn))
+     #           else:
+    #                print("failure too old", age_s, failfn)
             except Exception as e:
                 print("failure unparsable", failfn, e)
 
 
-        print(".", end="")
+        print(".", end="", flush=True)
 
         time.sleep(10)
