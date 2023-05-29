@@ -609,6 +609,15 @@ class OperationsReport(DataAnalysis):
         else:
             self.text = "INTEGRAL was not operational"
 
+from odafunction.executors import default_execute_to_value
+from odafunction.func.urifunc import URIipynbFunction
+
+def run_workflow(workflow, input):
+    f = URIipynbFunction.from_generic_uri("file://" + os.path.abspath(workflow))
+    print("found as", f)
+    f = f(**input)
+    print("found parameters applied as", f)
+    return default_execute_to_value(f, cached=True)['output_values']
 
 class CountLimits(DataAnalysis):
     input_target=Event
@@ -672,7 +681,9 @@ class CountLimits(DataAnalysis):
 
         # self.ias_data = ias_data
 
-        self.ias_data = json.load(open("integral_all_sky.json"))
+        # self.ias_data = json.load(open("integral_all_sky.json"))
+
+        self.ias_data = run_workflow("integralallsky.ipynb", dict(t0_utc=self.input_target.trigger_time))
 
         print("got ias data:")
         for k, v in self.ias_data.items():

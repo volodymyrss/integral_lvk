@@ -115,6 +115,12 @@ NOWRAP \VAR{ "%-8.3lg | %-7.3lg | %-3.2lg | %8.3lg +/- %-6.3lg +/- %-6.3lg | %-5
 Note that FAP estimates (especially at timescales above 2s) may be possibly further affected by enhanced non-stationary local background noise.
 This list excludes any excesses for which FAP is close to unity.
 
+We note that no independent IBAS alerts happened in the viscinity.
+
+SPI-ACS data can be retrieved in MMODA with this link.
+
+INTEGRAL follow-up alert was distributed to SCIMMA through HERMES few minutes after the trigger GCN.
+
 \VAR{FinalComment.comment}
 
 All results quoted are preliminary.
