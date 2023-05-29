@@ -1,5 +1,7 @@
 import base64
 from io import BytesIO
+import re
+import time
 from matrix_client.api import MatrixHttpApi
 import subprocess
 from .templates import format
@@ -84,5 +86,17 @@ def cleanup():
         except Exception as e:
             print(room, "failed to get room name due to", e)
             # print(matrix.get_room_messages(room, "", "b"))
-            print(matrix.get_room_aliases(room))
-            continue
+                
+        aliases = matrix.get_room_aliases(room)
+        print(room, aliases)
+
+        for alias in aliases:
+            if (r:=re.match(r"#INTEGRAL-MS([0-9]{6})[a-z]*?-test:matrix.org", alias)):
+                age_d = (time.time() - time.mktime(time.strptime(r.group(1), "%y%m%d"))) / 24/3600
+                print("may leave room", alias, "age", age_d)
+                if age_d > 1:
+                    print("\033[31mleave room\033[0m", alias)
+                    matrix.leave_room(room)
+                    break
+            else:
+                print("skip room", alias)
