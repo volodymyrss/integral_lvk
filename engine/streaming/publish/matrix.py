@@ -71,5 +71,18 @@ def get_a_room(event_id, test=True):
 
     except Exception as e:
         print("failed to get members due to", e)
+
+    # set_join_rule
     
     return room
+
+
+def cleanup():
+    for room in matrix.list_joined_rooms():
+        try:
+            print(room, matrix.get_room_name(room))
+        except Exception as e:
+            print(room, "failed to get room name due to", e)
+            # print(matrix.get_room_messages(room, "", "b"))
+            print(matrix.get_room_aliases(room))
+            continue
