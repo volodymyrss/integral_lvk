@@ -2,6 +2,9 @@ import time
 import click
 import logging
 
+from concurrent.futures import ThreadPoolExecutor
+
+
 from odafunction.executors import default_execute_to_value
 from odafunction.func.urifunc import URIipynbFunction
 import os
@@ -20,37 +23,44 @@ def pick_keys(d, keys):
     return {k:v for k, v in d.items() if k in keys}
 
 
+def publish(data, test=True):
+    if data['parse']['role'] == 'test':
+        test = True
+
+    publish_all(["hermes", "matrix"], data, test=test)
+
 def sequence(fn, publish=False, publish_production=False):
     data = {}
 
-    data['parse'] = run_workflow("workflows/parse.ipynb", {'alert_url': fn})
+    pool = ThreadPoolExecutor()
     
-    data['rtstate'] = run_workflow("workflows/rtstate.ipynb", {'t0_utc': data['parse']['t0_utc']})
+    parse_task = pool.submit(run_workflow, "workflows/parse.ipynb", {'alert_url': fn})
+    pool.submit(publish, dict(parse=parse_task.result()), test=not publish_production)
 
-    if data['parse']['role'] == 'test':
-        publish_production = False
+    rtstate_task = pool.submit(run_workflow("workflows/rtstate.ipynb", {'t0_utc': parse_task.result()['t0_utc']}))
+    pool.submit(publish, dict(rtstate=rtstate_task.result()), test=not publish_production)
 
-    if data['rtstate']['prophecy'][1]['expected_data_status'] == 'ONLINE':
+    # if data['rtstate']['prophecy'][1]['expected_data_status'] == 'ONLINE':
 
-        ivis_input = {'tstart_utc': data['parse']['t0_utc']}
-        ivis_input['target_healpix_url'] = data['parse']['skymap_url']
-        data['ivis'] = run_workflow("workflows/integral-visibility.ipynb", ivis_input)
+    #     ivis_input = {'tstart_utc': data['parse']['t0_utc']}
+    #     ivis_input['target_healpix_url'] = data['parse']['skymap_url']
+    #     data['ivis'] = run_workflow("workflows/integral-visibility.ipynb", ivis_input)
 
-        # iobserve_input = pick_keys(data['parse'], ['t0_utc'])
-        # run_workflow("workflows/iobserve.ipynb", iobserve_input)
+    #     # iobserve_input = pick_keys(data['parse'], ['t0_utc'])
+    #     # run_workflow("workflows/iobserve.ipynb", iobserve_input)
 
-        integralallsky_input = pick_keys(data['parse'], ['t0_utc'])
-        # # try:
-        integralallsky_input['mode'] = 'rt'
-        data['integralallsky'] = run_workflow("workflows/integralallsky.ipynb", integralallsky_input)
-        # # except Exception as e:
-        # #     integralallsky_input['mode'] = 'rt'
-        # #     data['integralallsky'] = run_workflow("workflows/integralallsky.ipynb", integralallsky_input)
-    else:
-        print("status if offline", data['rtstate'])
+    #     integralallsky_input = pick_keys(data['parse'], ['t0_utc'])
+    #     # # try:
+    #     integralallsky_input['mode'] = 'rt'
+    #     data['integralallsky'] = run_workflow("workflows/integralallsky.ipynb", integralallsky_input)
+    #     # # except Exception as e:
+    #     # #     integralallsky_input['mode'] = 'rt'
+    #     # #     data['integralallsky'] = run_workflow("workflows/integralallsky.ipynb", integralallsky_input)
+    # else:
+    #     print("status if offline", data['rtstate'])
 
-    if publish:
-        publish_all(["hermes", "matrix"], data, test=not publish_production)
+    # if publish:
+    #     publish_all(["hermes", "matrix"], data, test=not publish_production)
 
     
 
