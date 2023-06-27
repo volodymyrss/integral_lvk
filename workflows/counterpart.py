@@ -683,7 +683,10 @@ class CountLimits(DataAnalysis):
 
         # self.ias_data = json.load(open("integral_all_sky.json"))
 
-        self.ias_data = run_workflow("integralallsky.ipynb", dict(t0_utc=self.input_target.trigger_time))
+        self.ias_data = run_workflow("integralallsky.ipynb", dict(
+            t0_utc=self.input_target.trigger_time,
+            mode=self.input_datasource.datasource
+        ))
 
         print("got ias data:")
         for k, v in self.ias_data.items():
