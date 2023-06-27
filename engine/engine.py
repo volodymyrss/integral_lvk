@@ -40,12 +40,18 @@ def sequence(fn, publish=False, publish_production=False):
         # run_workflow("workflows/iobserve.ipynb", iobserve_input)
 
         integralallsky_input = pick_keys(data['parse'], ['t0_utc'])
-        # # try:
         integralallsky_input['mode'] = 'rt'
         data['integralallsky'] = run_workflow("workflows/integralallsky.ipynb", integralallsky_input)
-        # # except Exception as e:
-        # #     integralallsky_input['mode'] = 'rt'
-        # #     data['integralallsky'] = run_workflow("workflows/integralallsky.ipynb", integralallsky_input)
+
+        gcn_input = dict(
+            datasource="rt",
+            gcn_number="XXXXX",
+            name=data['parse']['name'],
+            t0_utc=data['parse']['t0_utc'],
+            event_kind=data['parse']['event_kind'],
+            healpix_url=data['parse']['skymap_url'],
+        )
+        data['gcn'] = run_workflow("workflows/gcn.ipynb", gcn_input)
     else:
         print("status if offline", data['rtstate'])
 
