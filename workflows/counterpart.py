@@ -690,6 +690,8 @@ class CountLimits(DataAnalysis):
 
         print("\033[31mgetting ias data by running workflow\033[0m")
 
+        raise Exception("not ready")
+
         self.ias_data = run_workflow("integralallsky.ipynb", dict(
             t0_utc=self.input_target.trigger_time,
             mode=self.input_datasource.datasource
