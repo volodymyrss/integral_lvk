@@ -293,14 +293,19 @@ class Event(DataAnalysis):
         if not hasattr(self,'_loc_map'):
 
             if len(self.healpix_url) > 0:
-                # c = requests.get(self.healpix_url).content    
+                skymap = QTable.read(target_healpix_url)
 
-                # try:
-                #     b = gzip.open(BytesIO(c))
-                #     b.seek(0)
-                #     f = fits.open(b)
-                # except:
-                #     f = fits.open(BytesIO(c))
+                import ligo.skymap.moc
+                import healpy
+
+                d = ligo.skymap.moc.rasterize(skymap, order=8)
+
+                skymap_local_fn = f'skymap_{self.gname}.fits'
+
+                healpy.write_map(skymap_local_fn, d['PROBDENSITY'], nest=True, overwrite=True)
+                # healpy.mollview(d['PROBDENSITY'], nest=True)
+
+                self.healpix_url = skymap_local_fn
 
                 f = fits.open(self.healpix_url)
 

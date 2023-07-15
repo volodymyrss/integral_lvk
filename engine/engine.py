@@ -45,9 +45,17 @@ def sequence(fn, publish=False, publish_production=False):
         data['integralallsky'] = run_workflow("workflows/integralallsky.ipynb", integralallsky_input)
         # # except Exception as e:
         # #     integralallsky_input['mode'] = 'rt'
-        # #     data['integralallsky'] = run_workflow("workflows/integralallsky.ipynb", integralallsky_input)
+        # #     data['integralallsky'] = run_workflow("workflows/integralallsky.ipynb", integralallsky_input)        
     else:
         print("status if offline", data['rtstate'])
+
+    print("data['parse']", data['parse'])
+
+    gcn_input = pick_keys(data['parse'], ['t0_utc'])
+    gcn_input['healpix_url'] = data['parse']['skymap_url']
+    gcn_input['name'] = data['parse']['event_id']
+    data['gcn'] = run_workflow("workflows/gcn.ipynb", gcn_input)
+        
 
     if publish:
         publish_all(["hermes", "matrix"], data, test=not publish_production)
