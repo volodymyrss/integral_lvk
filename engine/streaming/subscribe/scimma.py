@@ -67,7 +67,7 @@ def subscribe_scimma(topic):
                 print("unable to parse message", e)
 
             try:
-                with open(f"messages/inbox/scimma_{t0}.json", "w") as f:
+                with open(f"messages/inbox/scimma_{t0}.json", "wb") as f:
                     json.dump(message.content[0], f)
             except Exception as e:
                 print("unable to save message", e)

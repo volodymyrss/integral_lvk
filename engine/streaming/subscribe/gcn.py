@@ -38,6 +38,7 @@ consumer.subscribe(['gcn.classic.voevent.INTEGRAL_REFINED',
 @click.command("gcn")
 def subscribe_gcn():
     while True:
+        logger.info("still streaming gcns")
         for message in consumer.consume(timeout=1):
             value = message.value()
             logger.info("got message %s value %s", message, value)
@@ -49,8 +50,16 @@ def subscribe_gcn():
                 os.makedirs("messages/inbox", exist_ok=True)
                 label = re.sub("[^0-9a-zA-Z]", "_", value_json['voe:VOEvent']['@ivorn'])
                 with open(f"messages/inbox/{t0}_{label}.json", "w") as f:
-                    json.dump(value, f)
+                    json.dump(value_json, f)
+
             except Exception as e:
                 logger.error("unable to save message %s", e)
-                with open(f"messages/inbox/gcn_{t0}.data", "wb") as f:
-                    f.write(value)
+                while True:
+                    try:
+                        with open(f"messages/inbox/gcn_{t0}.data", "wb") as f:
+                            f.write(value)
+                    except Exception as e:
+                        logger.error("problem saving file due to %s, retrying", e)
+#                        time.sleep(10)
+                        continue
+                    

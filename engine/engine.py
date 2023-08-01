@@ -59,6 +59,11 @@ def sequence(fn, publish=False, publish_production=False):
     )
     data['gcn'] = run_workflow("workflows/gcn.ipynb", gcn_input)
 
+    print("gcn", data['gcn'].keys())
+    print("gcn_wrapped_text", data['gcn']['gcn_wrapped_text'])
+    print("data['integralallsky']", data['integralallsky'].keys())
+    print("data['integralallsky']['reportable_excesses']", data['integralallsky']['reportable_excesses'])
+
     if publish:
         publish_all(["hermes", "matrix"], data, test=not publish_production)
 
@@ -88,7 +93,7 @@ def run_sequence_loop(basedir, publish, publish_prod):
     while True:
 
         for fn in os.listdir(inbox):
-            if fn.endswith(".data"):
+            if fn.endswith(".json"):
                 full_fn = os.path.join(inbox, fn)
                 print("processing", full_fn)
                 try:
