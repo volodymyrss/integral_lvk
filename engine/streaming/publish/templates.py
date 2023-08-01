@@ -34,4 +34,5 @@ def format(data, test=True):
     return dict(
         title=title,
         body=body,
+        gcn=data['gcn']['gcn_wrapped_text']
     )

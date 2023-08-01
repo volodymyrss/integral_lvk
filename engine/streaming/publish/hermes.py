@@ -23,7 +23,7 @@ def publish(data, test):
 
     title = sections['title']
     message_text = sections['body']
-
+    
     message = {
         'topic': topic,
         'title': title,

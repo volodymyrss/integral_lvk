@@ -21,7 +21,7 @@ def publish(data, test=True):
         
     matrix.send_message(room, message)
 
-    for section in ['integralallsky', 'ivis']:
+    for section in ['integralallsky', 'ivis', 'gcn']:
         if section in data:
             for k, v in data[section].items():
                 if k.endswith("_content"):
