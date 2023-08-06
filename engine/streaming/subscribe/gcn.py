@@ -39,7 +39,7 @@ consumer.subscribe(['gcn.classic.voevent.INTEGRAL_REFINED',
 def subscribe_gcn():
     while True:
         logger.info("still streaming gcns")
-        for message in consumer.consume(timeout=1):
+        for message in consumer.consume(timeout=10):
             value = message.value()
             logger.info("got message %s value %s", message, value)
 
@@ -49,8 +49,10 @@ def subscribe_gcn():
                 value_json = xmltodict.parse(value)
                 os.makedirs("messages/inbox", exist_ok=True)
                 label = re.sub("[^0-9a-zA-Z]", "_", value_json['voe:VOEvent']['@ivorn'])
-                with open(f"messages/inbox/{t0}_{label}.json", "w") as f:
+                fn = f"messages/inbox/{t0}_{label}.json"                
+                with open(fn, "w") as f:
                     json.dump(value_json, f)
+                logger.info("saved message to %s", fn)
 
             except Exception as e:
                 logger.error("unable to save message %s", e)

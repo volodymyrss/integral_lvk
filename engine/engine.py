@@ -85,6 +85,7 @@ def run_sequence_loop(basedir, publish, publish_prod):
     inbox = os.path.join(basedir, "inbox")
     outbox = os.path.join(basedir, "archived")
     failbox = os.path.join(basedir, "failbox")    
+    permafail = os.path.join(basedir, "permafail")
 
     print("inbox", inbox)
     print("outbox", outbox)
@@ -93,7 +94,7 @@ def run_sequence_loop(basedir, publish, publish_prod):
     while True:
 
         for fn in os.listdir(inbox):
-            if fn.endswith(".json"):
+            if fn.endswith(".json") and 'gwnet_LVC_' in fn:
                 full_fn = os.path.join(inbox, fn)
                 print("processing", full_fn)
                 try:
@@ -114,6 +115,7 @@ def run_sequence_loop(basedir, publish, publish_prod):
     #                print("failure too old", age_s, failfn)
             except Exception as e:
                 print("failure unparsable", failfn, e)
+                os.rename(os.path.join(failbox, failfn), os.path.join(permafail, failfn))
 
 
         print(".", end="", flush=True)
