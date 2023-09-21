@@ -49,18 +49,24 @@ def sequence(fn, publish=False, publish_production=False):
     else:
         print("status if offline", data['rtstate'])
 
-    gcn_input = dict(
-        datasource="rt",
-        gcn_number="XXXXXX",
-        name=data['parse']['name'],
-        t0_utc=data['parse']['t0_utc'],
-        event_kind=data['parse']['event_kind'],
-        healpix_url=data['parse']['skymap_url'],
-    )
-    data['gcn'] = run_workflow("workflows/gcn.ipynb", gcn_input)
+    if False:
+        try:
+            gcn_input = dict(
+                datasource="rt",
+                gcn_number="XXXXXX",
+                name=data['parse']['name'],
+                t0_utc=data['parse']['t0_utc'],
+                event_kind=data['parse']['event_kind'],
+                healpix_url=data['parse']['skymap_url'],
+            )
+            data['gcn'] = run_workflow("workflows/gcn.ipynb", gcn_input)
 
-    print("gcn", data['gcn'].keys())
-    print("gcn_wrapped_text", data['gcn']['gcn_wrapped_text'])
+            print("gcn", data['gcn'].keys())
+            print("gcn_wrapped_text", data['gcn']['gcn_wrapped_text'])
+        except Exception as e:
+            print("problem with gcn", e)
+            raise
+
     print("data['integralallsky']", data['integralallsky'].keys())
     print("data['integralallsky']['reportable_excesses']", data['integralallsky']['reportable_excesses'])
 

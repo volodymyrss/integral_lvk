@@ -31,8 +31,13 @@ def format(data, test=True):
     print(title)
     print(body)
 
+    try:
+        gcn_circular_text = data['gcn']['gcn_wrapped_text']
+    except KeyError:
+        gcn_circular_text = ''
+
     return dict(
         title=title,
         body=body,
-        gcn=data['gcn']['gcn_wrapped_text']
+        gcn_circular_text=gcn_circular_text,
     )
