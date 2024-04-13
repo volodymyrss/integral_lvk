@@ -1,14 +1,20 @@
 import base64
 from io import BytesIO
+import os
 import re
 import time
 from matrix_client.api import MatrixHttpApi
 import subprocess
 from .templates import format
 
-token = subprocess.check_output(["pass", "matrix"]).decode("utf-8").strip()
-channel_real = subprocess.check_output(["pass", "matrix-imma-channel-real"]).decode("utf-8").strip()
-channel_test = subprocess.check_output(["pass", "matrix-imma-channel"]).decode("utf-8").strip()
+try:
+    token = subprocess.check_output(["pass", "matrix"]).decode("utf-8").strip()
+    channel_real = subprocess.check_output(["pass", "matrix-imma-channel-real"]).decode("utf-8").strip()
+    channel_test = subprocess.check_output(["pass", "matrix-imma-channel"]).decode("utf-8").strip()
+except:
+    token = os.getenv("MATRIX_TOKEN")
+    channel_real = os.getenv("MATRIX_IMMA_CHANNEL_REAL")
+    channel_test = os.getenv("MATRIX_IMMA_CHANNEL")
 
 matrix = MatrixHttpApi("https://matrix.org", token=token)
 

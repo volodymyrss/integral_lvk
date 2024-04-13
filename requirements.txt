@@ -6,3 +6,5 @@ isdc-client
 astropy_healpix
 integral-visibility
 ligo.skymap
+git+https://github.com/volodymyrss/oda-function.git
+matrix-client

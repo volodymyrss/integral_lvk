@@ -24,7 +24,7 @@ def sequence(fn, publish=False, publish_production=False):
     data = {}
 
     data['parse'] = run_workflow("workflows/parse.ipynb", {'alert_url': fn})
-    
+
     data['rtstate'] = run_workflow("workflows/rtstate.ipynb", {'t0_utc': data['parse']['t0_utc']})
 
     if data['parse']['role'] == 'test':
@@ -40,7 +40,8 @@ def sequence(fn, publish=False, publish_production=False):
         # run_workflow("workflows/iobserve.ipynb", iobserve_input)
 
         integralallsky_input = pick_keys(data['parse'], ['t0_utc'])
-        integralallsky_input['mode'] = 'rt'
+        integralallsky_input['mode'] = 'scw'
+        #integralallsky_input['mode'] = 'rt'
         data['integralallsky'] = run_workflow("workflows/integralallsky.ipynb", integralallsky_input)
         # # except Exception as e:
         # #     integralallsky_input['mode'] = 'rt'
@@ -108,6 +109,7 @@ def run_sequence_loop(basedir, publish, publish_prod):
                     if publish:
                         os.rename(full_fn, os.path.join(outbox, fn))
                 except Exception as e:
+                    raise
                     logging.error("failed to process %s: %s", fn, e)
                     os.rename(full_fn, os.path.join(failbox, fn))
 
