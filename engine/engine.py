@@ -24,11 +24,20 @@ def sequence(fn, publish=False, publish_production=False):
     data = {}
 
     data['parse'] = run_workflow("workflows/parse.ipynb", {'alert_url': fn})
+
+    print(data['parse'])
+
+    if data['parse']['useful_alert'] != 1:
+        print("ignoring not useful alert")
+        return
+    
+    if data['parse']['role'] == 'test':
+        #publish_production = False
+        print("ignoring test alert")
+        return
     
     data['rtstate'] = run_workflow("workflows/rtstate.ipynb", {'t0_utc': data['parse']['t0_utc']})
 
-    if data['parse']['role'] == 'test':
-        publish_production = False
 
     if data['rtstate']['prophecy'][1]['expected_data_status'] == 'ONLINE':
 
@@ -40,6 +49,7 @@ def sequence(fn, publish=False, publish_production=False):
         # run_workflow("workflows/iobserve.ipynb", iobserve_input)
 
         integralallsky_input = pick_keys(data['parse'], ['t0_utc'])
+        #integralallsky_input['mode'] = 'scw'
         integralallsky_input['mode'] = 'rt'
         data['integralallsky'] = run_workflow("workflows/integralallsky.ipynb", integralallsky_input)
         # # except Exception as e:
@@ -49,7 +59,8 @@ def sequence(fn, publish=False, publish_production=False):
     else:
         print("status if offline", data['rtstate'])
 
-    if False:
+    if True:
+    #if False:
         try:
             gcn_input = dict(
                 datasource="rt",
@@ -80,6 +91,15 @@ def sequence(fn, publish=False, publish_production=False):
 @click.option("--publish/--no-publish", default=False)
 @click.option("--publish-prod", is_flag=True, default=False)
 def run_sequence(fn, publish, publish_prod):
+
+    if fn.startswith("https://"):
+        import xmltodict as xd
+        import json, requests
+
+        url = fn
+        fn = os.getcwd() + "/messages/inbox/" + url.split("/")[-1].split(".")[0] + ".json"
+        json.dump(xd.parse(requests.get(url).text), open(fn, "w"))
+
     sequence(fn, publish=publish, publish_production=publish_prod)
 
 

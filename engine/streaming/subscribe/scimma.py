@@ -2,6 +2,7 @@ import json
 import time
 import click
 import logging
+import traceback
 
 from io import BytesIO
 from pprint import pprint
@@ -12,44 +13,45 @@ import astropy_healpix as ah
 from hop import stream
 import numpy as np
 
-def parse_notice(record):
-    # Only respond to mock events. Real events have GraceDB IDs like
-    # S1234567, mock events have GraceDB IDs like M1234567.
-    # NOTE NOTE NOTE replace the conditional below with this commented out
-    # conditional to only parse real events.
-    # if record['superevent_id'][0] != 'S':
-    #    return
-    if record['superevent_id'][0] != 'M':
-        return
+def parse_notice(records):
+    print(records)
 
-    if record['alert_type'] == 'RETRACTION':
-        print(record['superevent_id'], 'was retracted')
-        return
+    for record in records:
+        try:
+            if record['superevent_id'][0] != 'M':
+                return
+        except:
+            print("failed record", record)
+            raise
 
-    # Respond only to 'CBC' events. Change 'CBC' to 'Burst' to respond to
-    # only unmodeled burst events.
-    if record['event']['group'] != 'CBC':
-        return
+        if record['alert_type'] == 'RETRACTION':
+            print(record['superevent_id'], 'was retracted')
+            return
 
-    # Parse sky map
-    skymap_bytes = record.get('event', {}).pop('skymap')
-    if skymap_bytes:
-        # Parse skymap directly and print most probable sky location
-        skymap = Table.read(BytesIO(skymap_bytes))
+        # Respond only to 'CBC' events. Change 'CBC' to 'Burst' to respond to
+        # only unmodeled burst events.
+        if record['event']['group'] != 'CBC':
+            return
 
-        level, ipix = ah.uniq_to_level_ipix(
-            skymap[np.argmax(skymap['PROBDENSITY'])]['UNIQ']
-        )
-        ra, dec = ah.healpix_to_lonlat(ipix, ah.level_to_nside(level),
-                                       order='nested')
-        print(f'Most probable sky location (RA, Dec) = ({ra.deg}, {dec.deg})')
+        # Parse sky map
+        skymap_bytes = record.get('event', {}).pop('skymap')
+        if skymap_bytes:
+            # Parse skymap directly and print most probable sky location
+            skymap = Table.read(BytesIO(skymap_bytes))
 
-        # Print some information from FITS header
-        print(f'Distance = {skymap.meta["DISTMEAN"]} +/- {skymap.meta["DISTSTD"]}')
+            level, ipix = ah.uniq_to_level_ipix(
+                skymap[np.argmax(skymap['PROBDENSITY'])]['UNIQ']
+            )
+            ra, dec = ah.healpix_to_lonlat(ipix, ah.level_to_nside(level),
+                                           order='nested')
+            print(f'Most probable sky location (RA, Dec) = ({ra.deg}, {dec.deg})')
 
-    # Print remaining fields
-    print('Record:')
-    pprint(record)
+            # Print some information from FITS header
+            print(f'Distance = {skymap.meta["DISTMEAN"]} +/- {skymap.meta["DISTSTD"]}')
+
+        # Print remaining fields
+        print('Record:')
+        pprint(record)
 
 
 @click.command("scimma")
@@ -65,12 +67,14 @@ def subscribe_scimma(topic):
                 parse_notice(message.content)
             except Exception as e:
                 print("unable to parse message", e)
+                print(traceback.format_exc())
 
             try:
                 with open(f"messages/inbox/scimma_{t0}.json", "wb") as f:
-                    json.dump(message.content[0], f)
+                    json.dump(message.content[0].encode(), f)
             except Exception as e:
                 print("unable to save message", e)
+                print(traceback.format_exc())
 
 
 
