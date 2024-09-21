@@ -73,8 +73,8 @@ def subscribe_scimma(topic):
                 with open(f"messages/inbox/scimma_{t0}.json", "wb") as f:
                     json.dump(message.content[0].encode(), f)
             except Exception as e:
-                print("unable to save message", e)
-                print(traceback.format_exc())
+                print("unable to save message", repr(e)[:2000])
+                # print(traceback.format_exc())
 
 
 
