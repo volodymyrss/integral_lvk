@@ -12,6 +12,12 @@ import subprocess
 logger = logging.getLogger(__name__)
 
 def get_pass(name):
+    envname = "ILVK_" + re.sub("[^A-Z0-9]+", "_", name.upper())
+
+    logger.warning("looking for %s", envname)
+
+    if value := os.getenv(envname):
+        return value
     return subprocess.check_output(["pass", name]).decode().strip()
 
 
