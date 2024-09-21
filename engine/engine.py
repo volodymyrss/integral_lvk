@@ -20,14 +20,14 @@ def pick_keys(d, keys):
     return {k:v for k, v in d.items() if k in keys}
 
 
-def sequence(fn, publish=False, publish_production=False):
+def sequence(fn, publish=False, publish_production=False, ignore_filters=False):
     data = {}
 
     data['parse'] = run_workflow("workflows/parse.ipynb", {'alert_url': fn})
 
     print(data['parse'])
 
-    if data['parse']['useful_alert'] != 1:
+    if data['parse']['useful_alert'] != 1 and not ignore_filters:
         print("ignoring not useful alert")
         return
     
@@ -90,7 +90,8 @@ def sequence(fn, publish=False, publish_production=False):
 @click.argument("fn")
 @click.option("--publish/--no-publish", default=False)
 @click.option("--publish-prod", is_flag=True, default=False)
-def run_sequence(fn, publish, publish_prod):
+@click.option("--ignore-filters", is_flag=True, default=False)
+def run_sequence(fn, publish, publish_prod, ignore_filters):
 
     if fn.startswith("https://"):
         import xmltodict as xd
@@ -100,7 +101,7 @@ def run_sequence(fn, publish, publish_prod):
         fn = os.getcwd() + "/messages/inbox/" + url.split("/")[-1].split(".")[0] + ".json"
         json.dump(xd.parse(requests.get(url).text), open(fn, "w"))
 
-    sequence(fn, publish=publish, publish_production=publish_prod)
+    sequence(fn, publish=publish, publish_production=publish_prod, ignore_filters=ignore_filters)
 
 
 @click.command("process-inbox")
