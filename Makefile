@@ -12,7 +12,9 @@ run: build
 		-e MATRIX_TOKEN="" \
 		-e ILVK_GCN_KAFLA_ID=gcn-kafla-id \
 		-e ILVK_GCN_KAFLA_SECRET=gcn-kafla-id \
-			integral-lvk 
+			odahub/integral-lvk 
 
 build:
-	docker build . -t integral-lvk
+	docker build . -t odahub/integral-lvk --push
+
+
