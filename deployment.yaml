@@ -6,6 +6,9 @@ metadata:
     app: ilvk
 spec:
   replicas: 1
+  strategy:
+    type: Recreate
+
   selector:
     matchLabels:
       app: ilvk
@@ -38,41 +41,11 @@ spec:
         - /bin/sh
         - -c
         - mkdir -pv /app/messages/inbox /app/messages/failbox /app/messages/archived
-        env:
-        - name: NB2W_CACHE
-          value: /cache
-        - name: ILVK_GCN_KAFLA_ID
-          value: gcn-kafla-id
-        - name: ILVK_GCN_KAFLA_SECRET
-          value: gcn-kafla-secret
-        - name: MATRIX_IMMA_CHANNEL_REAL
-          value: ""
-        - name: MATRIX_IMMA_CHANNEL_TEST
-          value: ""
-        - name: MATRIX_TOKEN
-          valueFrom:
-            secretKeyRef:
-              name: matrix
-              key: token
-        - name: HERMES_API_KEY
-          valueFrom:
-            secretKeyRef:
-              name: hermes
-              key: api_key              
-
+        
         volumeMounts:
         - name: messages
           mountPath: /app/messages
-        - name: cache
-          mountPath: /cache
-        - name: urivalue
-          mountPath: /tmp/urivalue
-        - name: nb2workflow
-          mountPath: /app/.nb2workflow
-        - name: auth-toml
-          mountPath: /root/.config/hop/auth.toml
-          subPath: auth.toml
-
+        
       containers:
       - name: streaming-gcn
         image: ghcr.io/volodymyrss/integral_lvk:v0.1.0
@@ -99,6 +72,20 @@ spec:
             secretKeyRef:
               name: hermes
               key: api_key
+
+        volumeMounts:
+        - name: messages
+          mountPath: /app/messages
+        - name: cache
+          mountPath: /cache
+        - name: urivalue
+          mountPath: /tmp/urivalue
+        - name: nb2workflow
+          mountPath: /app/.nb2workflow
+        - name: auth-toml
+          mountPath: /root/.config/hop/auth.toml
+          subPath: auth.toml
+                      
 
       - name: streaming-scimma
         image: ghcr.io/volodymyrss/integral_lvk:v0.1.0
