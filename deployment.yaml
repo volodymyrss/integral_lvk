@@ -36,7 +36,7 @@ spec:
 
       initContainers:
       - name: init
-        image: ghcr.io/volodymyrss/integral_lvk:v0.1.1
+        image: ghcr.io/volodymyrss/integral_lvk:v0.1.0
         command:
         - /bin/sh
         - -c
@@ -47,8 +47,8 @@ spec:
           mountPath: /app/messages
         
       containers:
-      - name: streaming-gcn
-        image: ghcr.io/volodymyrss/integral_lvk:v0.1.1
+      - name: in-gcn
+        image: ghcr.io/volodymyrss/integral_lvk:v0.1.0
         args:
         - streaming-gcn
         env:
@@ -87,8 +87,8 @@ spec:
           subPath: auth.toml
                       
 
-      - name: streaming-scimma
-        image: ghcr.io/volodymyrss/integral_lvk:v0.1.1
+      - name: in-scimma
+        image: ghcr.io/volodymyrss/integral_lvk:v0.1.0
         args:
         - streaming-scimma
         env:
@@ -127,7 +127,7 @@ spec:
           subPath: auth.toml
         
       - name: process
-        image: ghcr.io/volodymyrss/integral_lvk:v0.1.1
+        image: ghcr.io/volodymyrss/integral_lvk:v0.1.0
         args:
         - process
         env:
