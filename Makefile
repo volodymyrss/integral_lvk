@@ -1,3 +1,6 @@
+deploy:
+	kubectl apply -f deployment.yaml
+
 run: build
 	docker run -it -u $(shell id -u) \
 		-v $(PWD)/messages:/app/messages \
