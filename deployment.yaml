@@ -1,0 +1,226 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ilvk
+  labels:
+    app: ilvk
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ilvk
+  template:
+    metadata:
+      labels:
+        app: ilvk
+    spec:
+      volumes:
+      - name: messages
+        persistentVolumeClaim:
+          claimName: ilvk-messages
+      - name: cache
+        persistentVolumeClaim:
+          claimName: ilvk-caches         
+      - name: urivalue
+        emptyDir: {}
+      - name: nb2workflow
+        persistentVolumeClaim:
+          claimName: ilvk-nb2workflow
+      - name: auth-toml
+        secret:
+          secretName: auth-toml
+          defaultMode: 0600
+
+      initContainers:
+      - name: init
+        image: ghcr.io/volodymyrss/integral_lvk:master
+        command:
+        - /bin/sh
+        - -c
+        - mkdir -pv /app/messages/inbox /app/messages/failbox /app/messages/archived
+        env:
+        - name: NB2W_CACHE
+          value: /cache
+        - name: ILVK_GCN_KAFLA_ID
+          value: gcn-kafla-id
+        - name: ILVK_GCN_KAFLA_SECRET
+          value: gcn-kafla-secret
+        - name: MATRIX_IMMA_CHANNEL_REAL
+          value: ""
+        - name: MATRIX_IMMA_CHANNEL_TEST
+          value: ""
+        - name: MATRIX_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: matrix
+              key: token
+        - name: HERMES_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: hermes
+              key: api_key              
+
+        volumeMounts:
+        - name: messages
+          mountPath: /app/messages
+        - name: cache
+          mountPath: /cache
+        - name: urivalue
+          mountPath: /tmp/urivalue
+        - name: nb2workflow
+          mountPath: /app/.nb2workflow
+        - name: auth-toml
+          mountPath: /root/.config/hop/auth.toml
+          subPath: auth.toml
+
+      containers:
+      - name: streaming-gcn
+        image: ghcr.io/volodymyrss/integral_lvk:master
+        args:
+        - streaming-gcn
+        env:
+        - name: NB2W_CACHE
+          value: /cache
+        - name: ILVK_GCN_KAFLA_ID
+          value: gcn-kafla-id
+        - name: ILVK_GCN_KAFLA_SECRET
+          value: gcn-kafla-secret
+        - name: MATRIX_IMMA_CHANNEL_REAL
+          value: ""
+        - name: MATRIX_IMMA_CHANNEL_TEST
+          value: ""
+        - name: MATRIX_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: matrix
+              key: token
+        - name: HERMES_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: hermes
+              key: api_key
+
+      - name: streaming-scimma
+        image: ghcr.io/volodymyrss/integral_lvk:master
+        args:
+        - streaming-scimma
+        env:
+        - name: NB2W_CACHE
+          value: /cache
+        - name: ILVK_GCN_KAFLA_ID
+          value: gcn-kafla-id
+        - name: ILVK_GCN_KAFLA_SECRET
+          value: gcn-kafla-secret
+        - name: MATRIX_IMMA_CHANNEL_REAL
+          value: ""
+        - name: MATRIX_IMMA_CHANNEL_TEST
+          value: ""
+        - name: MATRIX_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: matrix
+              key: token
+        - name: HERMES_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: hermes
+              key: api_key              
+
+        volumeMounts:
+        - name: messages
+          mountPath: /app/messages
+        - name: cache
+          mountPath: /cache
+        - name: urivalue
+          mountPath: /tmp/urivalue
+        - name: nb2workflow
+          mountPath: /app/.nb2workflow
+        - name: auth-toml
+          mountPath: /root/.config/hop/auth.toml
+          subPath: auth.toml
+        
+      - name: process
+        image: ghcr.io/volodymyrss/integral_lvk:master
+        args:
+        - process
+        env:
+        - name: NB2W_CACHE
+          value: /cache
+        - name: ILVK_GCN_KAFLA_ID
+          value: gcn-kafla-id
+        - name: ILVK_GCN_KAFLA_SECRET
+          value: gcn-kafla-secret
+        - name: MATRIX_IMMA_CHANNEL_REAL
+          value: ""
+        - name: MATRIX_IMMA_CHANNEL_TEST
+          value: ""
+        - name: MATRIX_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: matrix
+              key: token
+        - name: HERMES_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: hermes
+              key: api_key              
+
+        volumeMounts:
+        - name: messages
+          mountPath: /app/messages
+        - name: cache
+          mountPath: /cache
+        - name: urivalue
+          mountPath: /tmp/urivalue
+        - name: nb2workflow
+          mountPath: /app/.nb2workflow
+        - name: auth-toml
+          mountPath: /root/.config/hop/auth.toml
+          subPath: auth.toml
+        
+      
+
+---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: ilvk-messages
+spec:
+  storageClassName: vspherecsi-new
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 20Gi
+  
+
+---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: ilvk-caches
+spec:
+  storageClassName: vspherecsi-new
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 100Gi
+  
+
+---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: ilvk-nb2workflow
+spec:
+  storageClassName: vspherecsi-new
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 100Gi
+  

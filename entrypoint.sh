@@ -18,6 +18,10 @@ case $mode in
     export HOME=/cache/home
     python3 -m engine.cli process-inbox /app/messages --publish
     ;;
+  "babysit-realtime")
+    echo "Running in babysit mode"
+    python3 -m engine.cli babysit-realtime
+    ;;
 esac
     
 

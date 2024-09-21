@@ -18,3 +18,7 @@ build:
 	docker build . -t odahub/integral-lvk --push
 
 
+secrets:
+	kubectl create secret generic auth-toml --from-file=auth.toml=auth.toml --dry-run=client -o yaml | kubectl apply -f -
+	kubectl create secret generic matrix --from-literal=token=matrix --dry-run=client -o yaml | kubectl apply -f -
+	kubectl create secret generic hermes --from-literal=api_key=matrix --dry-run=client -o yaml | kubectl apply -f -
