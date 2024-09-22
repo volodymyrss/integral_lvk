@@ -64,6 +64,8 @@ spec:
             secretKeyRef:
               name: gcn-kafla
               key: secret
+        - name: GCN_SUB_TOPICS
+          value: "{{ .Values.gcn_sub_topics }}"
         - name: MATRIX_IMMA_CHANNEL_REAL
           value: ""
         - name: MATRIX_IMMA_CHANNEL_TEST
