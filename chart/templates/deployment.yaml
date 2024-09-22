@@ -55,9 +55,15 @@ spec:
         - name: NB2W_CACHE
           value: /cache
         - name: ILVK_GCN_KAFLA_ID
-          value: gcn-kafla-id
+          valueFrom:
+            secretKeyRef:
+              name: gcn-kafla
+              key: id
         - name: ILVK_GCN_KAFLA_SECRET
-          value: gcn-kafla-secret
+          valueFrom:
+            secretKeyRef:
+              name: gcn-kafla
+              key: secret
         - name: MATRIX_IMMA_CHANNEL_REAL
           value: ""
         - name: MATRIX_IMMA_CHANNEL_TEST
@@ -95,9 +101,15 @@ spec:
         - name: NB2W_CACHE
           value: /cache
         - name: ILVK_GCN_KAFLA_ID
-          value: gcn-kafla-id
+          valueFrom:
+            secretKeyRef:
+              name: gcn-kafla
+              key: id
         - name: ILVK_GCN_KAFLA_SECRET
-          value: gcn-kafla-secret
+          valueFrom:
+            secretKeyRef:
+              name: gcn-kafla
+              key: secret
         - name: MATRIX_IMMA_CHANNEL_REAL
           value: ""
         - name: MATRIX_IMMA_CHANNEL_TEST
@@ -134,9 +146,15 @@ spec:
         - name: NB2W_CACHE
           value: /cache
         - name: ILVK_GCN_KAFLA_ID
-          value: gcn-kafla-id
+          valueFrom:
+            secretKeyRef:
+              name: gcn-kafla
+              key: id
         - name: ILVK_GCN_KAFLA_SECRET
-          value: gcn-kafla-secret
+          valueFrom:
+            secretKeyRef:
+              name: gcn-kafla
+              key: secret
         - name: MATRIX_IMMA_CHANNEL_REAL
           value: ""
         - name: MATRIX_IMMA_CHANNEL_TEST
