@@ -27,22 +27,8 @@ consumer = Consumer(client_id=get_pass("gcn-kafla-id"),
 
 # TODO: add replay from last treated message
 
-# # Subscribe to topics and receive alerts
-# consumer.subscribe(['gcn.classic.voevent.INTEGRAL_REFINED',
-#                     'gcn.classic.voevent.INTEGRAL_SPIACS',
-#                     'gcn.classic.voevent.IPN_RAW',
-#                     'gcn.classic.text.LVC_EARLY_WARNING',
-#                     #'gcn.classic.voevent.LVC_TEST',
-#                     'gcn.classic.voevent.LVC_INITIAL',
-#                     'gcn.classic.voevent.LVC_PRELIMINARY',
-#                     'gcn.classic.voevent.',
-#                     ])
-
-consumer.subscribe(['gcn.classic.text.' + _ for _ in os.getenv("GCN_SUB_TOPICS", "").split(",")])
-
-
-    # consumer.seek('gcn.classic.voevent.INTEGRAL_REFINED', 0)
-
+consumer.subscribe(['gcn.classic.voevent.' + _ for _ in os.getenv("GCN_SUB_TOPICS", "").split(",")])
+    
 
 @click.command("gcn")
 def subscribe_gcn():
