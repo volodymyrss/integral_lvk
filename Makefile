@@ -1,5 +1,5 @@
 deploy:
-	kubectl apply -f deployment.yaml
+	helm upgrade --install ilvk  chart
 
 run: build
 	docker run -it -u $(shell id -u) \
