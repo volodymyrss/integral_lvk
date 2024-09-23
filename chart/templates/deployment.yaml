@@ -40,11 +40,14 @@ spec:
         command:
         - /bin/sh
         - -c
-        - mkdir -pv /app/messages/inbox /app/messages/failbox /app/messages/archived
+        - mkdir -pv /app/messages/inbox /app/messages/failbox /app/messages/archived 
+          mkdir -pv /cache/home/.cache/odafunction/
         
         volumeMounts:
         - name: messages
           mountPath: /app/messages
+        - name: cache
+          mountPath: /cache
         
       containers:
       - name: in-gcn
