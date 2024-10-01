@@ -1,4 +1,5 @@
 import time
+import traceback
 import click
 import logging
 
@@ -131,6 +132,7 @@ def run_sequence_loop(basedir, publish, publish_prod):
                     if publish:
                         os.rename(full_fn, os.path.join(outbox, fn))
                 except Exception as e:
+                    traceback.print_exc()
                     logging.error("failed to process %s: %s", fn, e)
                     os.rename(full_fn, os.path.join(failbox, fn))
 
