@@ -20,7 +20,7 @@ run: build
 			odahub/integral-lvk 
 
 build:
-	docker build . -t odahub/integral-lvk:$(VERSION) --push
+	docker build . -t ghcr.io/volodymyrss/integral_lvk:$(VERSION) --push
 
 
 secrets:
