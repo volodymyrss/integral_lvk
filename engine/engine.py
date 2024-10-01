@@ -65,7 +65,7 @@ def sequence(fn, publish=False, publish_production=False, ignore_filters=False):
     #if False:
         try:
             gcn_input = dict(
-                datasource="rt",
+                datasource="scw",
                 gcn_number="XXXXXX",
                 name=data['parse']['name'],
                 t0_utc=data['parse']['t0_utc'],
