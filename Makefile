@@ -1,5 +1,7 @@
+VERSION=$(shell git describe --always --tags)
+
 deploy:
-	helm upgrade --install ilvk  chart
+	helm upgrade --install ilvk  chart --set image.tag=$(VERSION)
 
 run: build
 	docker run -it -u $(shell id -u) \
@@ -18,7 +20,7 @@ run: build
 			odahub/integral-lvk 
 
 build:
-	docker build . -t odahub/integral-lvk --push
+	docker build . -t odahub/integral-lvk:$(VERSION) --push
 
 
 secrets:
