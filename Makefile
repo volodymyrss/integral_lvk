@@ -1,4 +1,5 @@
 VERSION=$(shell git describe --always --tags)
+IMAGE=ghcr.io/volodymyrss/integral_lvk:$(VERSION)
 
 deploy:
 	helm upgrade --install ilvk  chart --set image.tag=$(VERSION)
@@ -17,10 +18,10 @@ run: build
 		-e MATRIX_TOKEN="" \
 		-e ILVK_GCN_KAFLA_ID=gcn-kafla-id \
 		-e ILVK_GCN_KAFLA_SECRET=gcn-kafla-id \
-			odahub/integral-lvk 
+			$(IMAGE)
 
 build:
-	docker build . -t ghcr.io/volodymyrss/integral_lvk:$(VERSION) --push
+	docker build . -t $(IMAGE) #--push
 
 
 secrets:

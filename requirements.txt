@@ -8,4 +8,5 @@ integral-visibility
 ligo.skymap
 git+https://github.com/volodymyrss/oda-function.git
 git+https://github.com/volodymyrss/data-analysis.git
+git+https://github.com/oda-hub/nb2workflow.git
 matrix-client
